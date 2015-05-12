@@ -11,16 +11,15 @@ import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.plugins.petrinet.PetriNetVisualization;
-import org.processmining.plugins.wpp.objects.GspPetrinet;
+import org.processmining.plugins.wpp.objects.Output;
  
-@Plugin(name = "Show GSP Petri net",
-        parameterLabels = { "Gsp Petri net" },
-        returnLabels = { "GSP Petri net viewer" },
+@Plugin(name = "Algoritmo genético",
+        parameterLabels = { "Medias y valores" },
+        returnLabels = { "Medias y valores viewer" },
         returnTypes = { JComponent.class },
         userAccessible = false)
 @Visualizer
-public class GspPetrinetVisualizer {
+public class OutputVisualizer {
 
   /*
    * Here, we just return a passive JComponent object, but it is perfectly ok for a 
@@ -35,22 +34,37 @@ public class GspPetrinetVisualizer {
    */
   @PluginVariant(requiredParameterLabels = { 0 })
   public static JComponent visualize(final PluginContext context,
-                                     final GspPetrinet fsp) {
-    PetriNetVisualization pnv = new PetriNetVisualization();
-    JPanel pBotones = new JPanel();
-//    JComponent pPetri = pnv.visualize(context, fsp.getPetri());
+                                     final Output gen
+                                     ) {
+    JPanel pMedias = new JPanel();
+    JPanel pDivision = new JPanel();
     JPanel pMix = new JPanel();
-    
-    pBotones.setLayout(new GridLayout(fsp.getGsp().getSecondLastCycle().size(), 1));
-    for (int i = 0; i<fsp.getGsp().getSecondLastCycle().size(); i++) {
-      JButton bSequence = new JButton(fsp.getGsp().getSecondLastCycle().getSequenceAt(i).toString());
+    pDivision.setLayout(new GridLayout(gen.getGenetic().getNumAtributos(), gen.getGenetic().getCiudades().size()+1));
+    pMedias.setLayout(new GridLayout(gen.getGenetic().getNumAtributos(), 9));
+    JButton leyenda = new JButton("Medias");
+    leyenda.setBackground(java.awt.Color.darkGray);
+    leyenda.setForeground(java.awt.Color.white);
+    pMedias.add(leyenda);
+    for (int i = 0; i<gen.getGenetic().getNumAtributos()-1; i++) {
+      JButton bSequence = new JButton(gen.getGenetic().getAtributos().get(i) +": "+gen.getGenetic().getMedias().get(i).toString());
       bSequence.setBackground(java.awt.Color.darkGray);
       bSequence.setForeground(java.awt.Color.white);
-      pBotones.add(bSequence);
+      pMedias.add(bSequence);
+    }
+    leyenda = new JButton("División");
+    leyenda.setBackground(java.awt.Color.darkGray);
+    leyenda.setForeground(java.awt.Color.white);
+    pDivision.add(leyenda);
+    for (int i = 0; i<gen.getGenetic().getCiudades().size(); i++) {
+      JButton bSequence = new JButton(gen.getGenetic().getCiudades().get(i) +": "+gen.getGenetic().getDivision().get(i).toString());
+      bSequence.setBackground(java.awt.Color.darkGray);
+      bSequence.setForeground(java.awt.Color.white);
+      pDivision.add(bSequence);
     }
     pMix.setLayout(new BorderLayout());
 //    pMix.add(pPetri, BorderLayout.CENTER);
-    pMix.add(pBotones, BorderLayout.EAST);
+    pMix.add(pMedias, BorderLayout.WEST);
+    pMix.add(pDivision, BorderLayout.EAST);
     
  // Always return a single parameter of type JComponent
     return pMix;

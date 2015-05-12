@@ -10,7 +10,6 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.util.ui.widgets.ProMComboBox;
 import org.processmining.framework.util.ui.widgets.ProMPropertiesPanel;
 import org.processmining.framework.util.ui.widgets.ProMTextArea;
-import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.plugins.wpp.objects.Gsp;
 import org.processmining.plugins.wpp.objects.GspPetrinet;
 
@@ -45,30 +44,30 @@ public class GspPlugin {
                   email = "mauriziorendon@gmail.com",
                   uiLabel = UITopiaVariant.USEPLUGIN)
   //Indica que este metodo es una variante del plugin
-  @PluginVariant(requiredParameterLabels = { 0, 1, 2 })
+  @PluginVariant(requiredParameterLabels = { 0, 1 })
   public static GspPetrinet build(final UIPluginContext context,
-                                 final Petrinet petri,
+//                                 final Petrinet petri,
                                  final Instances arff,
                                  final GspConfiguration config) {
     
     Gsp gsp = new Gsp(arff, config.isDebug(), config.getSupport(), 
         config.getIdData(), config.getFilterAttribute());
-    
-    return new GspPetrinet(gsp, petri);
+   
+    return new GspPetrinet(gsp);
   }
  
   @UITopiaVariant(affiliation = "Universidad de la Laguna",
       author = "Maurizio Rendon",
       email = "mauriziorendon@gmail.com",
       uiLabel = UITopiaVariant.USEPLUGIN)
-  @PluginVariant(requiredParameterLabels = { 0, 1 })
+  @PluginVariant(requiredParameterLabels = { 0 })
   public static GspPetrinet build(final UIPluginContext context,
-                                 final Petrinet petri,
+//                                 final Petrinet petri,
                                  final Instances arff) {
     
     GspConfiguration config = new GspConfiguration(arff);
     config = populate(context, arff, config);
-    return build(context, petri, arff, config);
+    return build(context, arff, config);
   }
   
   /* Populate es el que crea y lanza las ventanas de prom para pedir una configuracion

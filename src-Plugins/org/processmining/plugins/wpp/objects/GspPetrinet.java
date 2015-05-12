@@ -2,7 +2,6 @@ package org.processmining.plugins.wpp.objects;
 
 import org.processmining.framework.annotations.AuthoredType;
 import org.processmining.framework.annotations.Icon;
-import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 
 @AuthoredType(typeName = "GSP Petri net",
     affiliation = "Universidad de la Laguna",
@@ -12,19 +11,19 @@ import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 public class GspPetrinet {
 
   private Gsp gsp;
-  private Petrinet petri;
+//  private Petrinet petri;
   
-  public GspPetrinet(Gsp gsp, Petrinet petri) {
+  public GspPetrinet(Gsp gsp) {
     this.gsp = gsp;
-    this.petri = petri;
+//    this.petri = petri;
   }
 
   public Gsp getGsp() {
     return gsp;
   }
 
-  public Petrinet getPetri() {
-    return petri;
-  }
+//  public Petrinet getPetri() {
+//    return petri;
+//  }
 
 }

@@ -46,7 +46,7 @@ public class GeneticPlugin {
     
     GeneticConfiguration config = new GeneticConfiguration(arff);
     config = populate(context, arff, config);
-    Genetic genetic = new Genetic(arff, config.isDebug(), config.getDividendo(), config.getDivisor(), config.getNumAtributos());
+    Genetic genetic = new Genetic(arff, config.isDebug(), config.getDividendo(), config.getDivisor(), config.getNumAtributos(), config.getAttributes());
     return new Output(genetic);
   }
   

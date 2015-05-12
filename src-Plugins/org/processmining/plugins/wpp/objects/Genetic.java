@@ -17,13 +17,16 @@ import weka.core.Instances;
 public class Genetic {
   private List<Double> medias;
   private List<Double> division;
+  private List<String> atributos;
+  private List<String> ciudades;
   private int numAtributos;
   private boolean debug;
   private int dividendo;
   private int divisor;
 
-  public Genetic(Instances instances, boolean d, int i, int f, int a) {
+  public Genetic(Instances instances, boolean d, int i, int f, int a, ArrayList<String> atritutos) {
     setDebug(d);
+    setAtributos(atritutos);
     setDividendo(i);
     setDivisor(f);
     setNumAtributos(a);
@@ -41,8 +44,10 @@ public class Genetic {
     double temp = 0;
     medias =  new ArrayList<Double>();
     division =  new ArrayList<Double>();
+    ciudades =  new ArrayList<String>();
     Attribute att = instances.attribute(0);
     for (int i = 0; i < att.numValues(); i++) {
+      ciudades.add(att.value(i));
       for (int j = 0; j < numAtributos; j++) {
         if (i==0) {
           medias.add(instances.get(i).value(j));
@@ -105,6 +110,22 @@ public class Genetic {
 
   public void setDivision(List<Double> division) {
     this.division = division;
+  }
+
+  public List<String> getAtributos() {
+    return atributos;
+  }
+
+  public void setAtributos(List<String> atributos) {
+    this.atributos = atributos;
+  }
+
+  public List<String> getCiudades() {
+    return ciudades;
+  }
+
+  public void setCiudades(List<String> ciudades) {
+    this.ciudades = ciudades;
   }
 
 }
