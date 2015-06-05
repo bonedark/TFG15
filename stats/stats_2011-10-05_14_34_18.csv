@@ -1,0 +1,7 @@
+Timestamp; Generation; Fittest; Average; Deviation; replayFitness; BehApp; Coverage; bestCandidate
+2011-10-05 14:35:12 ; 0 ; 0,72429 ; 0,457106 ; 0,109289 ; 0,7488 ; 0,701333 ; 1 ; XOR(AND(A+complete,A+start),XOR(B+complete,B+start))
+2011-10-05 14:35:34 ; 1 ; 0,726843 ; 0,546671 ; 0,093974 ; 0,727912 ; 0,725778 ; 1 ; XOR(A+complete,SEQ(AND(A+start,B+start),B+complete))
+2011-10-05 14:35:56 ; 2 ; 0,830962 ; 0,60648 ; 0,100528 ; 0,876404 ; 0,79 ; 1 ; XOR(SEQ(AND(A+start),A+complete),XOR(B+complete,B+start))
+2011-10-05 14:36:13 ; 3 ; 0,830962 ; 0,664065 ; 0,081089 ; 0,876404 ; 0,79 ; 1 ; XOR(SEQ(AND(A+start),A+complete),XOR(B+complete,B+start))
+2011-10-05 14:36:32 ; 4 ; 0,830962 ; 0,645809 ; 0,095427 ; 0,876404 ; 0,79 ; 1 ; XOR(SEQ(AND(A+start),A+complete),XOR(B+complete,B+start))
+2011-10-05 14:36:53 ; 5 ; 1 ; 0,664285 ; 0,143309 ; 1 ; 1 ; 1 ; XOR(SEQ(AND(A+start),A+complete),SEQ(B+start,XOR(B+complete)))

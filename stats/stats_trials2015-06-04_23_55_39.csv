@@ -1,0 +1,4 @@
+trial; generation; fitness; tree; duration
+0; 999; 2; [ f:2,000 p:0,000 s:0,000 g:0,000 ] SEQ( LEAF: Verzenden ontvangst bevestiging+complete , SEQ( LEAF: Ontvangst aanvraag+complete , LEAF: FIRST event+complete ) ); 01:16:32.297
+1; 999; 2; [ f:2,000 p:0,000 s:0,000 g:0,000 ] SEQ( LEAF: Ontvangst aanvraag+complete , SEQ( LEAF: Verzenden ontvangst bevestiging+complete , LEAF: FIRST event+complete ) ); 01:14:41.486
+2; 999; 1; [ f:1,000 p:1,000 s:0,000 g:0,000 ] SEQ( LEAF: Ontvangst aanvraag+complete , SEQ( LEAF: Verzenden ontvangst bevestiging+complete , LEAF: FIRST event+complete ) ); 01:09:14.027
