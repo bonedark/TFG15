@@ -79,7 +79,7 @@ public class GeneticAlgorithm {
 	 * TERMINATION
 	 */
 	//Maximum number of iterations(/generations) to try
-	private int maxIterations = 1000;
+	private int maxIterations = 10;
 	//Nr of steady states
 	private int steadyStates = Math.max((maxIterations / 100), 2);
 
@@ -142,7 +142,7 @@ public class GeneticAlgorithm {
 			/**/
 		} else {
 			//Don't use islands
-
+		  System.out.println("ELSE");
 			/*-*/
 			AbstractEvolutionEngine<Tree> engine = new GenerationalEvolutionEngine<Tree>(factory,
 					new EvolutionPipeline<Tree>(operators), evaluator, selectionStrategy, new MersenneTwisterRNG()) {
@@ -189,6 +189,89 @@ public class GeneticAlgorithm {
 
 		return tree;
 	}
+	
+	public List<Tree> runCandidatos(final String path) {
+
+    //Building a list of operators for tree (crossover and mutation)
+    List<EvolutionaryOperator<Tree>> operators = new ArrayList<EvolutionaryOperator<Tree>>(2);
+    operators.add(factory); //First introduce a random candidate instead of the worst
+    operators.add(new TreeCrossover(crossoverProbability)); //Then let them mate
+    operators.add(new TreeMutation(factory)); //Then mutate
+
+    //The evaluator will tell me how good (/bad) my trees are
+    TreeEvaluatorAStar evaluator = new TreeEvaluatorAStar(canceller, evolutionLogger, factory.getLog(),
+        fitnessWeight, simplicityWeight, generalizationWeight, precisionWeight);
+
+    //The future resulting tree
+    Tree tree;
+
+    if (useIslands) {
+      /*
+       * Use islands
+       */
+      /*-*/
+      //MAIN ENGINE CALL for islands
+      IslandEvolution<Tree> engine = new IslandEvolution<Tree>(nrIslands, new RingMigration(), factory,
+          new EvolutionPipeline<Tree>(operators), evaluator, selectionStrategy, new MersenneTwisterRNG());
+
+      //optionally add the observer
+      engine.addEvolutionObserver(evolutionLogger);
+
+      tree = engine.evolve(
+          populationSizePerIsland, // Population size per island.
+          eliteCount, epochLength, migrantCount, new ProMCancelTerminationCondition(canceller),
+          new TargetFitness(targetFitness, evaluator.isNatural()));
+
+      /**/
+    } else {
+      //Don't use islands
+      System.out.println("ELSE");
+      /*-*/
+      AbstractEvolutionEngine<Tree> engine = new GenerationalEvolutionEngine<Tree>(factory,
+          new EvolutionPipeline<Tree>(operators), evaluator, selectionStrategy, new MersenneTwisterRNG()) {
+        private int generation = 0;
+
+        protected List<EvaluatedCandidate<Tree>> evaluatePopulation(List<Tree> population) {
+          List<EvaluatedCandidate<Tree>> result = super.evaluatePopulation(population);
+          if (path != null) {
+            File log = new File(path + File.separator + "generation" + generation++ + ".log");
+            try {
+              if (log.getParent() != null) {
+                log.getParentFile().mkdirs();
+              }
+              log.createNewFile();
+              FileWriter writer = new FileWriter(log);
+              for (EvaluatedCandidate<Tree> cand : result) {
+                writer.append("f:" + cand.getFitness() + "  " + cand.getCandidate().toString());
+                writer.append("\n");
+              }
+              writer.close();
+            } catch (IOException e) {
+              System.err.println("LOST: " + path + File.separator + "generation" + generation++ + ".log");
+            }
+          }
+          return result;
+        }
+
+      };
+
+      /**/
+      engine.setSingleThreaded(singleThreaded);
+
+      engine.addEvolutionObserver(evolutionLogger);
+
+      //Build a tree with the event classes of our event log at the leafs
+      tree = engine.evolve(populationSize, eliteCount, new TargetFitness(targetFitness, evaluator.isNatural()),
+          new ProMCancelTerminationCondition(canceller), new GenerationCount(maxIterations), new Stagnation(
+              steadyStates, evaluator.isNatural(), true));
+      /**/
+    }
+
+    //Close the logging file so the buffer is written
+    evolutionLogger.closeFile();
+
+    return evolutionLogger.getCandidatos();
+  }
 
 	/**
 	 * GETTERS AND SETTERS

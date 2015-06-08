@@ -6,8 +6,10 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.deckfour.xes.in.XesXmlGZIPParser;
 import org.deckfour.xes.info.XLogInfo;
@@ -82,6 +84,55 @@ public class GeneticMinerPlugin {
 
 		return pn;
 	}
+	
+	 @Plugin(name = "Mine Block-structured Model  Listando candidatos", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { ArrayList.class }, userAccessible = true, help = "Mine a block structured process model Listando candidatos")
+	  @UITopiaVariant(uiLabel = "00JB Mine Block Structured Process Model Listando candidatos", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
+	  public List<Petrinet> PTGeneticMinerPluginCandidatos(final PluginContext context, XLog eventlog) {
+
+	    final Progress progress = context.getProgress();
+	    Canceller canceller = new Canceller() {
+
+	      public boolean isCancelled() {
+	        return progress.isCancelled();
+	      }
+	    };
+
+	    progress.setCaption("Starting Genetic Algorithm...");
+	    progress.setMinimum(0);
+	    //    progress.setIndeterminate(true); //set indeterminate for now...
+
+	    //eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f", "g");
+
+	    GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
+
+	    ga.setPopulationSize(200);
+	    ga.setTargetFitness(0.05);
+	    ga.setMaxIterations(10);
+	    ga.setEliteCount(20);
+	    ga.setCrossoverProbability(new Probability(0.2d));
+	    ga.setRandomCandidateCount(20);
+	    ga.setSteadyStates(100); //disable steady states
+
+	    progress.setMaximum(ga.getMaxIterations() + 2);
+
+	    progress.inc();
+	    try {
+	      PackageManager.getInstance().findOrInstallPackages("LpSolve");
+	    } catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	    List<Tree> tree = ga.runCandidatos(null);
+
+	    TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
+	    List<Petrinet> pn =  new ArrayList<Petrinet>();
+	    for (int i=0; i<tree.size();i++) {
+	      pn.add(PNconvertor.buildPetrinet(tree.get(i)));
+	    }
+
+	    //PNconvertor.applyMurata(context, pn);
+
+	    return pn;
+	  }
 
 	@Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
 	@UITopiaVariant(uiLabel = "00JB TRIAL Mine Block Structured Process Model using genetic algorithm", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")

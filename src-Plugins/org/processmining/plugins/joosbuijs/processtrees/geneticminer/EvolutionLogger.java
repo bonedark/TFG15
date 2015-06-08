@@ -21,7 +21,9 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.plugins.boudewijn.tree.Tree;
@@ -45,6 +47,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 	private DecimalFormat df = new DecimalFormat("#.######");
 	private Calendar cal;
 	private int nrGenerations = 0;
+	List<Tree> candidatos;
 
 	//Writing to a file
 	private FileOutputStream fos;
@@ -61,6 +64,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 
 		this.context = context;
 		this.fileLoggingEnabled = fileLoggingEnabled;
+		this.candidatos = new ArrayList<Tree>();
 
 		if (this.fileLoggingEnabled) {
 			//File writing stuff
@@ -99,6 +103,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 
 		Tree tree = (Tree) data.getBestCandidate();
 		String bestCandadidateString = tree.toString();
+		candidatos.add(tree);
 
 		//Prepare values
 		int generation = data.getGenerationNumber();
@@ -107,6 +112,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 		stddev = data.getFitnessStandardDeviation();
 		double fitness = tree.getReplayFitness();
 
+		
 		/*-*/
 		if (showOnConsole) {
 			System.out.println("Generation " + generation + ": " + df.format(bestOverallFitness) + "("
@@ -169,4 +175,12 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 			return meanFitness + 2 * stddev;
 		}
 	}
+
+  public List<Tree> getCandidatos() {
+    return candidatos;
+  }
+
+  public void setCandidatos(List<Tree> candidatos) {
+    this.candidatos = candidatos;
+  }
 }
