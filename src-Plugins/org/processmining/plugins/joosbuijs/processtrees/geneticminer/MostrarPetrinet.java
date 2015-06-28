@@ -18,13 +18,13 @@ public class MostrarPetrinet extends Frame implements ActionListener {
   TextField text = new TextField(20);
   Button b;
   private int numClicks = 0;
-  private int title;
+  private String title;
   private JPanel panel;
   private JComponent candidato;
 
-  public MostrarPetrinet(int title, JPanel panel, JComponent candidato) {
+  public MostrarPetrinet(String title, JPanel panel, JComponent candidato) {
 
-    super(title+"");
+    super(title);
     this.title = title;
     setLayout(new FlowLayout());
     b = new Button("Click me");

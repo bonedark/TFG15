@@ -111,6 +111,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 		meanFitness = data.getMeanFitness();
 		stddev = data.getFitnessStandardDeviation();
 		double fitness = tree.getReplayFitness();
+		double candidatos = tree.getCoincidenciaFitness();
 
 		
 		/*-*/
@@ -126,7 +127,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 		if (fileLoggingEnabled) {
 			//And to a file
 			out.println(sdf.format(cal.getTime()) + " ; " + generation + " ; " + df.format(bestOverallFitness) + " ; "
-					+ df.format(meanFitness) + " ; " + df.format(stddev) + " ; " + df.format(fitness) + " ; "
+					+ df.format(meanFitness) + " ; " + df.format(stddev) + " ; " + df.format(fitness) + " ; GSP:" + df.format(candidatos) + " ; "
 					//+ df.format(coverage) + " ; "
 					+ bestCandadidateString);
 			out.flush();
@@ -136,7 +137,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 		context.getProgress().inc();
 		context.log("Generation " + data.getGenerationNumber() + ": " + data.getBestCandidateFitness() + " ( f:"
 				+ df.format(tree.getReplayFitness()) + " p:" + df.format(tree.getPrecision()) + " s:"
-				+ df.format(tree.getSimplicity()) + " g:" + df.format(tree.getGeneralization()) + ")");
+				+ df.format(tree.getSimplicity()) + " g:" + df.format(tree.getGeneralization()) + " ; GSP:" + df.format(candidatos) + " ;)");
 
 		//And update the nr generations needed
 		setNrGenerations(generation);

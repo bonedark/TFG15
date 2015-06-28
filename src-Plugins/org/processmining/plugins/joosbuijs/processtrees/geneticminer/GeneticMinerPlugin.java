@@ -30,6 +30,9 @@ import org.processmining.plugins.boudewijn.tree.Node;
 import org.processmining.plugins.boudewijn.tree.Tree;
 import org.uncommons.maths.random.Probability;
 
+import weka.associations.GeneralizedSequentialPatterns;
+import weka.core.Instances;
+
 /**
  * Plug-in definition for the Genetic Process Discovery Algorithm based on
  * Process Trees
@@ -39,310 +42,390 @@ import org.uncommons.maths.random.Probability;
  */
 public class GeneticMinerPlugin {
 
-	@Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
-	@UITopiaVariant(uiLabel = "00JB Mine Block Structured Process Model using genetic algorithm", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
-	public Petrinet PTGeneticMinerPlugin(final PluginContext context, XLog eventlog) {
+  private List<Secuencia> cycles;
 
-		final Progress progress = context.getProgress();
-		Canceller canceller = new Canceller() {
+  @Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
+  @UITopiaVariant(uiLabel = "00JB Mine Block Structured Process Model using genetic algorithm", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
+  public Petrinet PTGeneticMinerPlugin(final PluginContext context,
+      XLog eventlog) {
 
-			public boolean isCancelled() {
-				return progress.isCancelled();
-			}
-		};
+    final Progress progress = context.getProgress();
+    Canceller canceller = new Canceller() {
 
-		progress.setCaption("Starting Genetic Algorithm...");
-		progress.setMinimum(0);
-		//		progress.setIndeterminate(true); //set indeterminate for now...
+      public boolean isCancelled() {
+        return progress.isCancelled();
+      }
+    };
 
-		//eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f", "g");
+    progress.setCaption("Starting Genetic Algorithm...");
+    progress.setMinimum(0);
+    // progress.setIndeterminate(true); //set indeterminate for now...
 
-		GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
+    // eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f",
+    // "g");
 
-		ga.setPopulationSize(200);
-		ga.setTargetFitness(0.05);
-		ga.setMaxIterations(100);
-		ga.setEliteCount(20);
-		ga.setCrossoverProbability(new Probability(0.2d));
-		ga.setRandomCandidateCount(20);
-		ga.setSteadyStates(100); //disable steady states
+    GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
 
-		progress.setMaximum(ga.getMaxIterations() + 2);
+    ga.setPopulationSize(200);
+    ga.setTargetFitness(0.05);
+    ga.setMaxIterations(100);
+    ga.setEliteCount(20);
+    ga.setCrossoverProbability(new Probability(0.2d));
+    ga.setRandomCandidateCount(20);
+    ga.setSteadyStates(100); // disable steady states
 
-		progress.inc();
-		try {
-			PackageManager.getInstance().findOrInstallPackages("LpSolve");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		Tree tree = ga.run(null);
+    progress.setMaximum(ga.getMaxIterations() + 2);
 
-		TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
-		Petrinet pn = PNconvertor.buildPetrinet(tree);
+    progress.inc();
+    try {
+      PackageManager.getInstance().findOrInstallPackages("LpSolve");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    Tree tree = ga.run(null);
 
-		//PNconvertor.applyMurata(context, pn);
+    TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
+    Petrinet pn = PNconvertor.buildPetrinet(tree);
 
-		return pn;
-	}
-	
-	 @Plugin(name = "Mine Block-structured Model  Listando candidatos", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { ArrayList.class }, userAccessible = true, help = "Mine a block structured process model Listando candidatos")
-	  @UITopiaVariant(uiLabel = "00JB Mine Block Structured Process Model Listando candidatos", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
-	  public List<Petrinet> PTGeneticMinerPluginCandidatos(final PluginContext context, XLog eventlog) {
+    // PNconvertor.applyMurata(context, pn);
 
-	    final Progress progress = context.getProgress();
-	    Canceller canceller = new Canceller() {
+    return pn;
+  }
 
-	      public boolean isCancelled() {
-	        return progress.isCancelled();
-	      }
-	    };
+  @Plugin(name = "Mine Block-structured Model  Listando candidatos", parameterLabels = {
+      "Event log", "Instances" }, returnLabels = { "Block Structured Model" }, returnTypes = { ArrayList.class }, userAccessible = true, help = "Mine a block structured process model Listando candidatos")
+  @UITopiaVariant(uiLabel = "00JB Mine Block Structured Process Model Listando candidatos", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
+  public List<PetriFitness> PTGeneticMinerPluginCandidatos(
+      final PluginContext context, XLog eventlog, final Instances arff) {
 
-	    progress.setCaption("Starting Genetic Algorithm...");
-	    progress.setMinimum(0);
-	    //    progress.setIndeterminate(true); //set indeterminate for now...
+    final Progress progress = context.getProgress();
 
-	    //eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f", "g");
+    Canceller canceller = new Canceller() {
 
-	    GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
+      public boolean isCancelled() {
+        return progress.isCancelled();
+      }
+    };
+    // Set<String> attr = eventlog.getAttributes().keySet();
+    // ArrayList<Attribute> atributos = new ArrayList<Attribute>();
+    // Iterator<String> it = attr.iterator();
+    // while (it.hasNext()) {
+    // String valor = it.next();
+    // XAttribute asdf = eventlog.getAttributes().get(valor);
+    // atributos.add(new Attribute(valor));
+    // }
+    // Instances data = new Instances("GSP", atributos, 2);
+    //
+    GeneralizedSequentialPatterns gsp = new GeneralizedSequentialPatterns();
+    try {
+      gsp.buildAssociations(arff);
+    } catch (Exception e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    readFile(gsp.toString());
+    System.out.println(cycles.toString());
+    progress.setCaption("Starting Genetic Algorithm...");
+    progress.setMinimum(0);
+    // progress.setIndeterminate(true); //set indeterminate for now...
 
-	    ga.setPopulationSize(200);
-	    ga.setTargetFitness(0.05);
-	    ga.setMaxIterations(10);
-	    ga.setEliteCount(20);
-	    ga.setCrossoverProbability(new Probability(0.2d));
-	    ga.setRandomCandidateCount(20);
-	    ga.setSteadyStates(100); //disable steady states
+    // eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f",
+    // "g");
 
-	    progress.setMaximum(ga.getMaxIterations() + 2);
+    GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
 
-	    progress.inc();
-	    try {
-	      PackageManager.getInstance().findOrInstallPackages("LpSolve");
-	    } catch (Exception e) {
-	      e.printStackTrace();
-	    }
-	    List<Tree> tree = ga.runCandidatos(null);
+    ga.setPopulationSize(200);
+    ga.setTargetFitness(0.05);
+    ga.setMaxIterations(10);
+    ga.setEliteCount(20);
+    ga.setCrossoverProbability(new Probability(0.2d));
+    ga.setRandomCandidateCount(20);
+    ga.setSteadyStates(100); // disable steady states
 
-	    TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
-	    List<Petrinet> pn =  new ArrayList<Petrinet>();
-	    for (int i=0; i<tree.size();i++) {
-	      pn.add(PNconvertor.buildPetrinet(tree.get(i)));
-	    }
+    progress.setMaximum(ga.getMaxIterations() + 2);
+    ga.setCycles(cycles);
 
-	    //PNconvertor.applyMurata(context, pn);
+    progress.inc();
+    try {
+      PackageManager.getInstance().findOrInstallPackages("LpSolve");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    List<Tree> tree = ga.runCandidatos(null);
 
-	    return pn;
-	  }
+    TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
+    List<PetriFitness> pn = new ArrayList<PetriFitness>();
+    for (int i = 0; i < tree.size(); i++) {
+      PetriFitness petri = new PetriFitness(PNconvertor.buildPetrinet(tree.get(i)), tree.get(i).getOverallFitnessOld(), tree.get(i).getOverallFitness());
+      pn.add(petri);
+    }
 
-	@Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
-	@UITopiaVariant(uiLabel = "00JB TRIAL Mine Block Structured Process Model using genetic algorithm", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
-	public Petrinet PTGeneticMinerPluginTrials(final PluginContext context, XLog eventlog) {
-		final Progress progress = context.getProgress();
-		Canceller canceller = new Canceller() {
+    // PNconvertor.applyMurata(context, pn);
 
-			public boolean isCancelled() {
-				return progress.isCancelled();
-			}
-		};
-		progress.setCaption("Starting Genetic Algorithm TRIALS...");
-		progress.setMinimum(0);
-		progress.setIndeterminate(true); //set indeterminate for now...
+    return pn;
+  }
 
-		/*
-		 * SETTING UP LOG FILE
-		 */
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		SimpleDateFormat sdfFile = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
-		SimpleDateFormat sdfDuration = new SimpleDateFormat("HH:mm:ss.SSS");
+  protected void readFile(String archivo) {
 
-		String filename = "./stats/stats_trials" + sdfFile.format(cal.getTime()) + ".csv";
-		File statsFile = new File(filename);
+    boolean primera = false;
+    boolean segunda = false;
+    System.out.println(archivo);
+    List<Secuencia> ciclo = new ArrayList<Secuencia>();
+    String[] lines = archivo.split("\n");
+    String linea;
+    int numSecuencia = 1;
+    for (int i = 0; i < lines.length; i++) {
 
-		//			statsFile.createNewFile();
-		statsFile.setWritable(true);
-		statsFile.setReadable(true);
+      linea = lines[i];
 
-		DecimalFormat df = new DecimalFormat("#.######");
-		FileOutputStream fos;
-		PrintWriter out = null;
-		try {
-			fos = new FileOutputStream(statsFile);
-			out = new PrintWriter(fos);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		out.println("trial; generation; fitness; tree; duration");
-		out.flush();
-		//out.close();
+      if (linea.contains("-sequences") && !segunda) {
+        i++;
+      } else if (linea.contains("<{")) {
+        Secuencia secu =  new Secuencia(linea.substring(linea.indexOf("<")+1 , linea.indexOf(">")),linea.substring(linea.indexOf("(")+1, linea.indexOf(")")));
+        ciclo.add(secu);
+      }
+    }
+    setCycles(ciclo);
+  }
 
-		/*
-		 * FINISHED SETTING UP THE LOG FILE
-		 */
+  @Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
+  @UITopiaVariant(uiLabel = "00JB TRIAL Mine Block Structured Process Model using genetic algorithm", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
+  public Petrinet PTGeneticMinerPluginTrials(final PluginContext context,
+      XLog eventlog) {
+    final Progress progress = context.getProgress();
+    Canceller canceller = new Canceller() {
 
-		Petrinet pn = null; //place holder for the last discovered PN
-		for (int i = 0; i < 100; i++) {
-			//eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f", "g");
+      public boolean isCancelled() {
+        return progress.isCancelled();
+      }
+    };
+    progress.setCaption("Starting Genetic Algorithm TRIALS...");
+    progress.setMinimum(0);
+    progress.setIndeterminate(true); // set indeterminate for now...
 
-			// Lets time our duration
-			XTimer mappingTimer = new XTimer();
-			mappingTimer.start();
-			cal = Calendar.getInstance();
-			String message = "Starting trial #" + i + " at " + sdf.format(cal.getTime());
-			System.out.println(message);
+    /*
+     * SETTING UP LOG FILE
+     */
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat sdfFile = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
+    SimpleDateFormat sdfDuration = new SimpleDateFormat("HH:mm:ss.SSS");
 
-			/*
-			 * MAIN CALL
-			 */
-			GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
-			ga.setPopulationSize(200);
-			ga.setSteadyStates(ga.getMaxIterations()); //no steady state stop this time
+    String filename = "./stats/stats_trials" + sdfFile.format(cal.getTime())
+        + ".csv";
+    File statsFile = new File(filename);
 
-			try {
-				PackageManager.getInstance().findOrInstallPackages("LpSolve");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			Tree tree = ga.run(null);
+    // statsFile.createNewFile();
+    statsFile.setWritable(true);
+    statsFile.setReadable(true);
 
-			TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
-			pn = PNconvertor.buildPetrinet(tree);
+    DecimalFormat df = new DecimalFormat("#.######");
+    FileOutputStream fos;
+    PrintWriter out = null;
+    try {
+      fos = new FileOutputStream(statsFile);
+      out = new PrintWriter(fos);
+    } catch (FileNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    out.println("trial; generation; fitness; tree; duration");
+    out.flush();
+    // out.close();
 
-			/*
-			 * LOG THIS TRIAL
-			 */
-			mappingTimer.stop();
+    /*
+     * FINISHED SETTING UP THE LOG FILE
+     */
 
-			cal = Calendar.getInstance();
-			System.out.println("Ending trial #" + i + " at " + sdf.format(cal.getTime()) + " after "
-					+ mappingTimer.getDuration());
+    Petrinet pn = null; // place holder for the last discovered PN
+    for (int i = 0; i < 100; i++) {
+      // eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f",
+      // "g");
 
-			EvolutionLogger<Tree> evolutionLogger = ga.getEvolutionLogger();
-			out.println(i + "; " + evolutionLogger.getNrGenerations() + "; " + df.format(tree.getReplayFitness())
-					+ "; " + tree.toString() + "; " + sdfDuration.format(new Date(mappingTimer.getDuration())));
-			out.flush();
-		}
+      // Lets time our duration
+      XTimer mappingTimer = new XTimer();
+      mappingTimer.start();
+      cal = Calendar.getInstance();
+      String message = "Starting trial #" + i + " at "
+          + sdf.format(cal.getTime());
+      System.out.println(message);
 
-		out.close();
-		//PNconvertor.applyMurata(context, pn);
+      /*
+       * MAIN CALL
+       */
+      GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
+      ga.setPopulationSize(200);
+      ga.setSteadyStates(ga.getMaxIterations()); // no steady state stop this
+                                                 // time
 
-		return pn;
-	}
+      try {
+        PackageManager.getInstance().findOrInstallPackages("LpSolve");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      Tree tree = ga.run(null);
 
-	@Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
-	@UITopiaVariant(uiLabel = "00JB Block Miner - TEST plugin (Tree to PN)", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
-	public Petrinet PTGeneticMinerPluginTEST(final PluginContext context, XLog eventlog) {
-		XLogInfo logInfo = XLogInfoFactory.createLogInfo(eventlog, XLogInfoImpl.STANDARD_CLASSIFIER);
+      TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
+      pn = PNconvertor.buildPetrinet(tree);
 
-		Node node = Node
-				.fromString(
-						//a12 Tree:
-						"SEQ( LEAF: SSSTTTAAARRRTTT+complete , SEQ( SEQ( SEQ( LEAF: A+complete , XOR( SEQ( LEAF: B+complete , SEQ( AND( SEQ( LEAF: D+complete , LEAF: E+complete ) , LEAF: F+complete ) , LEAF: J+complete ) ) , SEQ( LEAF: C+complete , SEQ( XOR( LEAF: G+complete , SEQ( LEAF: H+complete , LEAF: I+complete ) ) , LEAF: K+complete ) ) ) ) , LEAF: L+complete ) , LEAF: EEENNNDDD+complete ) )",
-						logInfo.getEventClasses());
-		//Extremely large tree (20 OR nodes which result in ~4 million enabled transitions. Test on SEQ6
-		//LOOP( SEQ( OR( LEAF: A+complete , OR( OR( LEAF: C+complete , LEAF: D+complete ) , LEAF: D+complete ) ) , OR( OR( AND( LEAF: B+complete , OR( OR( SEQ( OR( LEAF: A+complete , XOR( OR( LEAF: C+complete , LEAF: D+complete ) , LEAF: D+complete ) ) , OR( OR( AND( LEAF: B+complete , OR( OR( LEAF: A+complete , OR( LEAF: F+complete , LEAF: D+complete ) ) , LEAF: E+complete ) ) , OR( LEAF: F+complete , LEAF: D+complete ) ) , LEAF: E+complete ) ) , OR( OR( OR( LEAF: F+complete , LEAF: A+complete ) , LEAF: D+complete ) , LEAF: E+complete ) ) , LEAF: E+complete ) ) , OR( LEAF: F+complete , LEAF: D+complete ) ) , LEAF: E+complete ) ) , LEAF: EXIT )
+      /*
+       * LOG THIS TRIAL
+       */
+      mappingTimer.stop();
 
-		/*-*/
-		EvolutionLogger<Tree> evolutionLogger = new EvolutionLogger<Tree>(context);
-		final Progress progress = context.getProgress();
-		Canceller canceller = new Canceller() {
+      cal = Calendar.getInstance();
+      System.out.println("Ending trial #" + i + " at "
+          + sdf.format(cal.getTime()) + " after " + mappingTimer.getDuration());
 
-			public boolean isCancelled() {
-				return progress.isCancelled();
-			}
-		};
-		try {
-			PackageManager.getInstance().findOrInstallPackages("LpSolve");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+      EvolutionLogger<Tree> evolutionLogger = ga.getEvolutionLogger();
+      out.println(i + "; " + evolutionLogger.getNrGenerations() + "; "
+          + df.format(tree.getReplayFitness()) + "; " + tree.toString() + "; "
+          + sdfDuration.format(new Date(mappingTimer.getDuration())));
+      out.flush();
+    }
 
-		TreeEvaluatorAStar eval = new TreeEvaluatorAStar(canceller, evolutionLogger, eventlog, 1.0, 1.0, 1.0, 1.0);
+    out.close();
+    // PNconvertor.applyMurata(context, pn);
 
-		TreeFactory fact = new TreeFactory(eventlog, 1);
+    return pn;
+  }
 
-		/*-* /
-		Tree tree = null;
-		for (int i = 0; i < 10; i++) {
-			Tree tempTree = fact.generateRandomCandidate(new MersenneTwisterRNG());
+  @Plugin(name = "Mine Block-structured Model using a Genetic Algorithm", parameterLabels = { "Event log" }, returnLabels = { "Block Structured Model" }, returnTypes = { Petrinet.class }, userAccessible = true, help = "Mine a block structured process model from an event log using a genetic algorithm")
+  @UITopiaVariant(uiLabel = "00JB Block Miner - TEST plugin (Tree to PN)", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
+  public Petrinet PTGeneticMinerPluginTEST(final PluginContext context,
+      XLog eventlog) {
+    XLogInfo logInfo = XLogInfoFactory.createLogInfo(eventlog,
+        XLogInfoImpl.STANDARD_CLASSIFIER);
 
-			eval.calculateSimplicity(tempTree.getRoot());
-			tree = tempTree;
-		}/**/
+    Node node = Node
+        .fromString(
+            // a12 Tree:
+            "SEQ( LEAF: SSSTTTAAARRRTTT+complete , SEQ( SEQ( SEQ( LEAF: A+complete , XOR( SEQ( LEAF: B+complete , SEQ( AND( SEQ( LEAF: D+complete , LEAF: E+complete ) , LEAF: F+complete ) , LEAF: J+complete ) ) , SEQ( LEAF: C+complete , SEQ( XOR( LEAF: G+complete , SEQ( LEAF: H+complete , LEAF: I+complete ) ) , LEAF: K+complete ) ) ) ) , LEAF: L+complete ) , LEAF: EEENNNDDD+complete ) )",
+            logInfo.getEventClasses());
+    // Extremely large tree (20 OR nodes which result in ~4 million enabled
+    // transitions. Test on SEQ6
+    // LOOP( SEQ( OR( LEAF: A+complete , OR( OR( LEAF: C+complete , LEAF:
+    // D+complete ) , LEAF: D+complete ) ) , OR( OR( AND( LEAF: B+complete , OR(
+    // OR( SEQ( OR( LEAF: A+complete , XOR( OR( LEAF: C+complete , LEAF:
+    // D+complete ) , LEAF: D+complete ) ) , OR( OR( AND( LEAF: B+complete , OR(
+    // OR( LEAF: A+complete , OR( LEAF: F+complete , LEAF: D+complete ) ) ,
+    // LEAF: E+complete ) ) , OR( LEAF: F+complete , LEAF: D+complete ) ) ,
+    // LEAF: E+complete ) ) , OR( OR( OR( LEAF: F+complete , LEAF: A+complete )
+    // , LEAF: D+complete ) , LEAF: E+complete ) ) , LEAF: E+complete ) ) , OR(
+    // LEAF: F+complete , LEAF: D+complete ) ) , LEAF: E+complete ) ) , LEAF:
+    // EXIT )
 
-		Tree tree = new Tree(node);
-		eval.getFitness(tree, null);
+    /*-*/
+    EvolutionLogger<Tree> evolutionLogger = new EvolutionLogger<Tree>(context);
+    final Progress progress = context.getProgress();
+    Canceller canceller = new Canceller() {
 
-		//		double fitness = eval.getFitness(tree, null);
-		/**/
+      public boolean isCancelled() {
+        return progress.isCancelled();
+      }
+    };
+    try {
+      PackageManager.getInstance().findOrInstallPackages("LpSolve");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-		System.out.println(node.printBehaviorRecursive());
+    TreeEvaluatorAStar eval = new TreeEvaluatorAStar(canceller,
+        evolutionLogger, eventlog, 1.0, 1.0, 1.0, 1.0);
 
-		TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
-		Petrinet pn = PNconvertor.buildPetrinet(node);
+    TreeFactory fact = new TreeFactory(eventlog, 1);
 
-		PNconvertor.applyMurata(context, pn);
+    /*-* /
+    Tree tree = null;
+    for (int i = 0; i < 10; i++) {
+    	Tree tempTree = fact.generateRandomCandidate(new MersenneTwisterRNG());
 
-		return pn;
-	}
+    	eval.calculateSimplicity(tempTree.getRoot());
+    	tree = tempTree;
+    }/**/
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		int i = 0;
-		String eventlogFile = args[i++];
+    Tree tree = new Tree(node);
+    eval.getFitness(tree, null);
 
-		XesXmlGZIPParser logparser = new XesXmlGZIPParser();
-		XLog eventlog;
-		try {
-			eventlog = logparser.parse(new File(eventlogFile)).get(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
+    // double fitness = eval.getFitness(tree, null);
+    /**/
 
-		double targetFitness = Double.parseDouble(args[i++]);
-		int polulationSize = Integer.parseInt(args[i++]);
-		int eliteCount = Integer.parseInt(args[i++]);
-		Probability crossoverProbability = new Probability(Double.parseDouble(args[i++]));
-		int randomCandidateCount = Integer.parseInt(args[i++]);
-		int maxIterations = Integer.parseInt(args[i++]);
-		int steadyStates = Math.max(Integer.parseInt(args[i++]), 2);
-		double wf = Double.parseDouble(args[i++]);
-		double wp = Double.parseDouble(args[i++]);
-		double wg = Double.parseDouble(args[i++]);
-		double ws = Double.parseDouble(args[i++]);
+    System.out.println(node.printBehaviorRecursive());
 
-		String path = args[i++];
-		CLIContext global = new CLIContext();
-		CLIPluginContext clic = new CLIPluginContext(global, "CLI ngrid context");
+    TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
+    Petrinet pn = PNconvertor.buildPetrinet(node);
 
-		Canceller canceller = new Canceller() {
+    PNconvertor.applyMurata(context, pn);
 
-			public boolean isCancelled() {
-				return false;
-			}
-		};
+    return pn;
+  }
 
-		GeneticAlgorithm ga = new GeneticAlgorithm(clic, canceller, eventlog);
+  /**
+   * 
+   * @param args
+   */
+  public static void main(String[] args) {
+    int i = 0;
+    String eventlogFile = args[i++];
 
-		ga.setPopulationSize(polulationSize);
-		ga.setTargetFitness(targetFitness); //allow for a very small deviation from perfection
-		ga.setEliteCount(eliteCount);
-		ga.setCrossoverProbability(crossoverProbability);
-		ga.setRandomCandidateCount(randomCandidateCount);
-		ga.setMaxIterations(maxIterations);
-		ga.setSteadyStates(steadyStates);
-		ga.setFitnessWeight(wf);
-		ga.setPrecisionWeight(wp);
-		ga.setGeneralizationWeight(wg);
-		ga.setSimplicityWeight(ws);
+    XesXmlGZIPParser logparser = new XesXmlGZIPParser();
+    XLog eventlog;
+    try {
+      eventlog = logparser.parse(new File(eventlogFile)).get(0);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return;
+    }
 
-		Tree tree = ga.run(path);
+    double targetFitness = Double.parseDouble(args[i++]);
+    int polulationSize = Integer.parseInt(args[i++]);
+    int eliteCount = Integer.parseInt(args[i++]);
+    Probability crossoverProbability = new Probability(
+        Double.parseDouble(args[i++]));
+    int randomCandidateCount = Integer.parseInt(args[i++]);
+    int maxIterations = Integer.parseInt(args[i++]);
+    int steadyStates = Math.max(Integer.parseInt(args[i++]), 2);
+    double wf = Double.parseDouble(args[i++]);
+    double wp = Double.parseDouble(args[i++]);
+    double wg = Double.parseDouble(args[i++]);
+    double ws = Double.parseDouble(args[i++]);
 
-		//System.out.println(tree.toString());
-	}
+    String path = args[i++];
+    CLIContext global = new CLIContext();
+    CLIPluginContext clic = new CLIPluginContext(global, "CLI ngrid context");
+
+    Canceller canceller = new Canceller() {
+
+      public boolean isCancelled() {
+        return false;
+      }
+    };
+
+    GeneticAlgorithm ga = new GeneticAlgorithm(clic, canceller, eventlog);
+
+    ga.setPopulationSize(polulationSize);
+    ga.setTargetFitness(targetFitness); // allow for a very small deviation from
+                                        // perfection
+    ga.setEliteCount(eliteCount);
+    ga.setCrossoverProbability(crossoverProbability);
+    ga.setRandomCandidateCount(randomCandidateCount);
+    ga.setMaxIterations(maxIterations);
+    ga.setSteadyStates(steadyStates);
+    ga.setFitnessWeight(wf);
+    ga.setPrecisionWeight(wp);
+    ga.setGeneralizationWeight(wg);
+    ga.setSimplicityWeight(ws);
+
+    Tree tree = ga.run(path);
+
+    // System.out.println(tree.toString());
+  }
+
+  public List<Secuencia> getCycles() {
+    return cycles;
+  }
+
+  public void setCycles(List<Secuencia> cycles) {
+    this.cycles = cycles;
+  }
 }

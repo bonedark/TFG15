@@ -12,7 +12,9 @@ public class Tree implements Comparable<Tree> {
 
 	private Node root;
 	private double overallFitness;
+	private double overallFitnessOld;
 	private double replayFitness;
+	private double coincidenciaFitness;
 	private double precision;
 	private double simplicity;
 	private double generalization;
@@ -234,5 +236,21 @@ public class Tree implements Comparable<Tree> {
 	public int compareTo(Tree o) {
 		return size - o.size;
 	}
+
+  public double getCoincidenciaFitness() {
+    return coincidenciaFitness;
+  }
+
+  public void setCoincidenciaFitness(double coincidenciaFitness) {
+    this.coincidenciaFitness = coincidenciaFitness;
+  }
+
+  public double getOverallFitnessOld() {
+    return overallFitnessOld;
+  }
+
+  public void setOverallFitnessOld(double overallFitnessOld) {
+    this.overallFitnessOld = overallFitnessOld;
+  }
 
 }

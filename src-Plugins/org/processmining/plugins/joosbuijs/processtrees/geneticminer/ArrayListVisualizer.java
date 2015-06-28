@@ -2,6 +2,7 @@ package org.processmining.plugins.joosbuijs.processtrees.geneticminer;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -12,7 +13,6 @@ import org.processmining.contexts.uitopia.annotations.Visualizer;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.plugins.petrinet.PetriNetVisualization;
  
 @Plugin(name = "Algoritmo genético",
@@ -22,6 +22,7 @@ import org.processmining.plugins.petrinet.PetriNetVisualization;
         userAccessible = false)
 @Visualizer
 public class ArrayListVisualizer {
+
 
   /*
    * Here, we just return a passive JComponent object, but it is perfectly ok for a 
@@ -36,21 +37,22 @@ public class ArrayListVisualizer {
    */
   @PluginVariant(requiredParameterLabels = { 0 })
   public static JComponent visualize(final PluginContext context,
-                                     final List<Petrinet> gen
+                                     final List<PetriFitness> gen
                                      ) {
     PetriNetVisualization pnv = new PetriNetVisualization();
     JComponent candidatos = new JPanel();
-    JComponent pPetri = pnv.visualize(context, gen.get(0));
+    JComponent pPetri = pnv.visualize(context, gen.get(0).getPetri());
     JPanel pMix = new JPanel(new GridLayout(1,2));
     candidatos.setLayout(new GridLayout(4, 1));
     JPanel pBotones = new JPanel();
     pBotones.setLayout(new GridLayout(gen.size(), 1));
+    DecimalFormat df = new DecimalFormat("#.####");
     for (int i = 0; i<gen.size();i++) {
-      JButton bSequence = new JButton(i+"");
+      JButton bSequence = new JButton(i+" Fitness:"+ df.format(gen.get(i).getFitness())+" GSP:"+df.format(gen.get(i).getCoincidencias()));
 //      bSequence.setSize(200, 100);
       bSequence.setBackground(java.awt.Color.darkGray);
       bSequence.setForeground(java.awt.Color.white);
-      bSequence.addActionListener(new MostrarPetrinet(i,pMix,pnv.visualize(context, gen.get(i))));
+      bSequence.addActionListener(new MostrarPetrinet(i+" Fitness:"+gen.get(i).getFitness()+" GSP:"+gen.get(i).getCoincidencias(),pMix,pnv.visualize(context, gen.get(i).getPetri())));
       pBotones.add(bSequence);
     }
 //    pMix.add(pnv.visualize(context, gen.get(0)), BorderLayout.CENTER);

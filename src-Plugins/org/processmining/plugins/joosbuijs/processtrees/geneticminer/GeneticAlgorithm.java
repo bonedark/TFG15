@@ -36,6 +36,7 @@ public class GeneticAlgorithm {
 
 	private Canceller canceller;
 	private TreeFactory factory;
+	private List<Secuencia> cycles;
 
 	/**
 	 * Evolution Parameters
@@ -87,6 +88,7 @@ public class GeneticAlgorithm {
 	private double simplicityWeight = 1.0;
 	private double generalizationWeight = 1.0;
 	private double precisionWeight = 1.0;
+	private double coincidenciaWeight = 1.0;
 
 	/*
 	 * OBJECTS
@@ -118,6 +120,7 @@ public class GeneticAlgorithm {
 		//The evaluator will tell me how good (/bad) my trees are
 		TreeEvaluatorAStar evaluator = new TreeEvaluatorAStar(canceller, evolutionLogger, factory.getLog(),
 				fitnessWeight, simplicityWeight, generalizationWeight, precisionWeight);
+		evaluator.setCycles(cycles);
 
 		//The future resulting tree
 		Tree tree;
@@ -200,7 +203,8 @@ public class GeneticAlgorithm {
 
     //The evaluator will tell me how good (/bad) my trees are
     TreeEvaluatorAStar evaluator = new TreeEvaluatorAStar(canceller, evolutionLogger, factory.getLog(),
-        fitnessWeight, simplicityWeight, generalizationWeight, precisionWeight);
+        fitnessWeight, simplicityWeight, generalizationWeight, precisionWeight, coincidenciaWeight);
+    evaluator.setCycles(cycles);
 
     //The future resulting tree
     Tree tree;
@@ -418,5 +422,21 @@ public class GeneticAlgorithm {
 	public void setSimplicityWeight(double simplicityWeight) {
 		this.simplicityWeight = simplicityWeight;
 	}
+
+  public List<Secuencia> getCycles() {
+    return cycles;
+  }
+
+  public void setCycles(List<Secuencia> cycles) {
+    this.cycles = cycles;
+  }
+
+  public double getCoincidenciaWeight() {
+    return coincidenciaWeight;
+  }
+
+  public void setCoincidenciaWeight(double coincidenciaWeight) {
+    this.coincidenciaWeight = coincidenciaWeight;
+  }
 
 }
