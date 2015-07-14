@@ -3,7 +3,7 @@
 <stringAttribute key="bad_container_name" value="\ProM\La"/>
 <booleanAttribute key="org.eclipse.ant.ui.DEFAULT_VM_INSTALL" value="true"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/ProM-Old/launch/build.xml"/>
+<listEntry value="/TFG15/launch/build.xml"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>

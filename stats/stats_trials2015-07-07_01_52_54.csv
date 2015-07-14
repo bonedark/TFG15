@@ -1,0 +1,8 @@
+trial; generation; fitness; tree; duration
+0; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] AND( LEAF: Completed+In Call , LEAF: Accepted+In Progress ); 00:00:24.107
+1; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] LEAF: Accepted+In Progress; 00:00:23.733
+2; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] SEQ( LEAF: Accepted+Wait - Customer , LEAF: Accepted+Wait - Implementation ); 00:00:25.127
+3; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] AND( AND( LEAF: Accepted+Wait - Vendor , LEAF: Unmatched+Unmatched ) , LEAF: Accepted+Wait - User ); 00:00:25.142
+4; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] AND( LEAF: Accepted+Wait - User , LEAF: Accepted+Wait - Customer ); 00:00:23.353
+5; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] XOR( LEAF: Accepted+Wait - Implementation , LEAF: Accepted+Wait - User ); 00:00:28.455
+6; 9; 0; [ f:0,000 p:0,000 s:0,000 g:0,000 ] AND( LEAF: Accepted+Wait - Implementation , LEAF: Accepted+In Progress ); 00:00:24.951

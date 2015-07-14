@@ -44,7 +44,7 @@ public class MostrarPetrinet extends Frame implements ActionListener {
 //    panel.setVisible(false);
 //    panel.setVisible(true);
     numClicks++;
-    System.out.println(title + "Button Clicked " + numClicks + " times");
+  //  System.out.println(title + "Button Clicked " + numClicks + " times");
   }
 
   public JPanel getPanel() {

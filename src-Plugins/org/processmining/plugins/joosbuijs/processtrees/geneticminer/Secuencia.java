@@ -1,5 +1,7 @@
 package org.processmining.plugins.joosbuijs.processtrees.geneticminer;
 
+import java.util.Arrays;
+
 public class Secuencia {
   private String[] nodo;
   private int valor;
@@ -24,6 +26,10 @@ public class Secuencia {
   }
   public void setValor(int valor) {
     this.valor = valor;
+  }
+  public String toString() {
+    return "Secuencia [nodo=" + Arrays.toString(nodo) + ", valor=" + valor
+        + "]";
   }
   
 

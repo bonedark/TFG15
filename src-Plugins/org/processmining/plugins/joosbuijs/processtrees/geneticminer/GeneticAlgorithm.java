@@ -44,7 +44,7 @@ public class GeneticAlgorithm {
 	//Target fitness to stop at
 	private double targetFitness = 0.05;
 	//Population size
-	private int populationSize = 100;
+	private int populationSize = 10;
 	//Number of candidates to keep and mutate/crossover (at least 2 to allow crossover)
 	private int eliteCount = Math.max(populationSize / 5, 2);
 	//Selection strategy
@@ -84,10 +84,10 @@ public class GeneticAlgorithm {
 	//Nr of steady states
 	private int steadyStates = Math.max((maxIterations / 100), 2);
 
-	private double fitnessWeight = 1.0;
-	private double simplicityWeight = 1.0;
-	private double generalizationWeight = 1.0;
-	private double precisionWeight = 1.0;
+	private double fitnessWeight = 0;
+	private double simplicityWeight = 0;
+	private double generalizationWeight = 0;
+	private double precisionWeight = 0;
 	private double coincidenciaWeight = 1.0;
 
 	/*
@@ -193,7 +193,7 @@ public class GeneticAlgorithm {
 		return tree;
 	}
 	
-	public List<Tree> runCandidatos(final String path) {
+	public List<Tree> runCandidatos(final String path, boolean inverso) {
 
     //Building a list of operators for tree (crossover and mutation)
     List<EvolutionaryOperator<Tree>> operators = new ArrayList<EvolutionaryOperator<Tree>>(2);
@@ -205,6 +205,7 @@ public class GeneticAlgorithm {
     TreeEvaluatorAStar evaluator = new TreeEvaluatorAStar(canceller, evolutionLogger, factory.getLog(),
         fitnessWeight, simplicityWeight, generalizationWeight, precisionWeight, coincidenciaWeight);
     evaluator.setCycles(cycles);
+    evaluator.setInverso(inverso);
 
     //The future resulting tree
     Tree tree;
@@ -229,7 +230,7 @@ public class GeneticAlgorithm {
       /**/
     } else {
       //Don't use islands
-      System.out.println("ELSE");
+      //System.out.println("ELSE");
       /*-*/
       AbstractEvolutionEngine<Tree> engine = new GenerationalEvolutionEngine<Tree>(factory,
           new EvolutionPipeline<Tree>(operators), evaluator, selectionStrategy, new MersenneTwisterRNG()) {

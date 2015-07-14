@@ -135,9 +135,7 @@ public class EvolutionLogger<T> implements IslandEvolutionObserver<T> {
 
 		//And output to ProM
 		context.getProgress().inc();
-		context.log("Generation " + data.getGenerationNumber() + ": " + data.getBestCandidateFitness() + " ( f:"
-				+ df.format(tree.getReplayFitness()) + " p:" + df.format(tree.getPrecision()) + " s:"
-				+ df.format(tree.getSimplicity()) + " g:" + df.format(tree.getGeneralization()) + " ; GSP:" + df.format(candidatos) + " ;)");
+		context.log("Generation " + data.getGenerationNumber() + ": " + data.getBestCandidateFitness() + " (Score: " + df.format(candidatos) + " )");
 
 		//And update the nr generations needed
 		setNrGenerations(generation);

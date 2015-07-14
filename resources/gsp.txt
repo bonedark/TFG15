@@ -1,9 +1,0 @@
-GeneralizedSequentialPatterns
-=============================
-
-Number of cycles performed: 0
-Total number of frequent sequences: 0
-
-Frequent Sequences Details (filtered):
-
-

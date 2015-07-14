@@ -48,11 +48,11 @@ public class ArrayListVisualizer {
     pBotones.setLayout(new GridLayout(gen.size(), 1));
     DecimalFormat df = new DecimalFormat("#.####");
     for (int i = 0; i<gen.size();i++) {
-      JButton bSequence = new JButton(i+" Fitness:"+ df.format(gen.get(i).getFitness())+" GSP:"+df.format(gen.get(i).getCoincidencias()));
+      JButton bSequence = new JButton(i+" Score:"+df.format(gen.get(gen.size()-1-i).getCoincidencias()));
 //      bSequence.setSize(200, 100);
-      bSequence.setBackground(java.awt.Color.darkGray);
-      bSequence.setForeground(java.awt.Color.white);
-      bSequence.addActionListener(new MostrarPetrinet(i+" Fitness:"+gen.get(i).getFitness()+" GSP:"+gen.get(i).getCoincidencias(),pMix,pnv.visualize(context, gen.get(i).getPetri())));
+      bSequence.setBackground(java.awt.Color.white);
+      bSequence.setForeground(java.awt.Color.black);
+      bSequence.addActionListener(new MostrarPetrinet(i+" Score:"+gen.get(gen.size()-1-i).getCoincidencias(),pMix,pnv.visualize(context, gen.get(gen.size()-1-i).getPetri())));
       pBotones.add(bSequence);
     }
 //    pMix.add(pnv.visualize(context, gen.get(0)), BorderLayout.CENTER);

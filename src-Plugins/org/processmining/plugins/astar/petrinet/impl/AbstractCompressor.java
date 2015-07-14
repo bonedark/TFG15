@@ -18,7 +18,7 @@ public abstract class AbstractCompressor<H> implements Deflater<H>, Inflater<H> 
 	protected BitMask readMask(InputStream stream, int length, int numBytes) throws IOException {
 		byte[] mask = new byte[numBytes];
 		stream.read(mask);
-		return new BitMask(mask);
+		return new BitMask(mask,numBytes);
 	}
 
 	protected ShortShortMultiset inflateContent(InputStream stream, int[] ids, short length) throws IOException {

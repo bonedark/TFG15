@@ -61,6 +61,8 @@ public class TreeEvaluatorAStar implements FitnessEvaluator<Tree> {
   private double simplicityWeight;
   private double generalizationWeight;
   private double precisionWeight;
+  private boolean debug = false;
+  private boolean inverso = false;
 
   /**
    * @param evolutionLogger
@@ -224,15 +226,32 @@ public class TreeEvaluatorAStar implements FitnessEvaluator<Tree> {
       List<Node> nodos = new ArrayList<Node>(candidate.getRoot()
           .getLeafs(false));
       double coincidencias = 0;
-      for (int i = 0; i < nodos.size(); i++) {
-        coincidencias += evaluarNodo(nodos.get(i));
+    //  if (nodos.size()<2) {
+  //      System.out.println("caso ufo");
+      //  setDebug(true);
+      //}
+      for (int i=0; i<  cycles.size();i++) {
+        coincidencias +=evaluarNodo(nodos, cycles.get(i));
       }
-      coincidenciaFitness = coincidencias / cycles.size();
+      System.out.println("coincidencias: "+coincidencias + " - cycles"+cycles.size());
+      if (inverso)
+        coincidenciaFitness = coincidencias / cycles.size();
+      else
+        coincidenciaFitness = coincidencias / nodos.size();
+    
+      // M‡s nodos
+      //coincidenciaFitness = coincidencias / nodos.size();
+      // Menos nodos
+     // coincidenciaFitness = coincidencias / cycles.size();
+//      coincidenciaFitness = 1-coincidenciaFitness;
       candidate.setCoincidenciaFitness(coincidenciaFitness);
 
     }
     // Remember this tree (not its fitness)
 
+   // System.out.println(
+//          "generalizationWeight * candidate.getGeneralization() = " + generalizationWeight * candidate.getGeneralization() +
+         // " - coincidenciaWeight * coincidenciaFitness = "+ coincidenciaWeight * coincidenciaFitness);
     double overallFitness =
           fitnessWeight * candidate.getReplayFitness() + //
           precisionWeight * candidate.getPrecision() + //
@@ -252,20 +271,25 @@ public class TreeEvaluatorAStar implements FitnessEvaluator<Tree> {
         
   
   // Normalize
-  overallFitnessOld /= (fitnessWeight + precisionWeight + simplicityWeight + generalizationWeight);
+  overallFitnessOld /= (fitnessWeight + precisionWeight + simplicityWeight + generalizationWeight)==0?1:(fitnessWeight + precisionWeight + simplicityWeight + generalizationWeight);
 
     candidate.setOverallFitness(overallFitness);
     candidate.setOverallFitnessOld(overallFitnessOld);
     return overallFitness;
   }
   
-  public double evaluarNodo(Node nodo) {
+  public double evaluarNodo(List<Node> nodo, Secuencia secuencia) {
     double valor = 0d;
-    for (int i=0; i<  cycles.size();i++) {
-      valor +=evaluarSecuencia(nodo, cycles.get(i));
+
+    for (int i = 0; i < nodo.size(); i++) {
+      valor +=evaluarSecuencia(nodo.get(i), secuencia);
     }
+    if (debug) System.out.println(valor+ " - " + nodo.size());
       
-    return valor;
+    if (inverso)
+      return valor==nodo.size()?0:1;
+    else
+      return valor==nodo.size()?1:0;
   }
   
   public double evaluarSecuencia(Node nodo, Secuencia secuencia) {
@@ -277,7 +301,7 @@ public class TreeEvaluatorAStar implements FitnessEvaluator<Tree> {
       String valorNodo = nodos.get(i).toString();
       valorNodo = valorNodo.substring(valorNodo.indexOf(":") > 0 ? valorNodo.indexOf(":")+2 : 0,
           valorNodo.indexOf("+") > 0 ? valorNodo.indexOf("+") : valorNodo.length() - 1);
-      if (secuencia.getNodo()[actual++].equals(valorNodo)) {
+      if (valorNodo.contains(secuencia.getNodo()[actual++])) {
         if (actual == max) {
           igual = true;
           actual = 0;
@@ -288,8 +312,10 @@ public class TreeEvaluatorAStar implements FitnessEvaluator<Tree> {
       }
         
     }
-    
-    return igual?secuencia.getValor():0d;
+//    if (inverso)
+//      return igual?1d:0d;  
+//    else
+      return igual?0d:1d;
   }
 
   private double calculateReplayFitness(Node root, double stopAt,
@@ -559,6 +585,22 @@ public class TreeEvaluatorAStar implements FitnessEvaluator<Tree> {
 
   public void setCoincidenciaWeight(double coincidenciaWeight) {
     this.coincidenciaWeight = coincidenciaWeight;
+  }
+
+  public boolean isDebug() {
+    return debug;
+  }
+
+  public void setDebug(boolean debug) {
+    this.debug = debug;
+  }
+
+  public boolean isInverso() {
+    return inverso;
+  }
+
+  public void setInverso(boolean inverso) {
+    this.inverso = inverso;
   }
 
 }

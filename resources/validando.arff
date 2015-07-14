@@ -1,0 +1,20 @@
+@relation 'running-example-weka.filters.unsupervised.attribute.Remove-R2,6'
+
+@attribute CaseID {1,2,3,4,5,6}
+@attribute dd-MM-yyyy:HH.mm {30-12-2010:11.02,31-12-2010:10.06,05-01-2011:15.12,06-01-2011:11.18,07-01-2011:14.24,30-12-2010:11.32,30-12-2010:12.12,30-12-2010:14.16,05-01-2011:11.22,08-01-2011:12.05,30-12-2010:14.32,30-12-2010:15.06}
+@attribute Activity {'register request','examine thoroughly','check ticket',decide,'reject request','examine casually','pay compensation','reinitiate request'}
+@attribute Resource {Pete,Sue,Mike,Sara,Sean,Ellen}
+
+@data
+1,30-12-2010:11.02,'register request',Pete
+1,31-12-2010:10.06,'register request',Sue
+1,05-01-2011:15.12,'register request',Mike
+1,06-01-2011:11.18,'register request',Sara
+1,07-01-2011:14.24,'register request',Pete
+2,30-12-2010:11.32,'register request',Mike
+2,30-12-2010:12.12,'register request',Mike
+2,30-12-2010:14.16,'register request',Sean
+2,05-01-2011:11.22,'register request',Sara
+2,08-01-2011:12.05,'register request',Ellen
+3,30-12-2010:14.32,'register request',Pete
+3,30-12-2010:15.06,'register request',Mike

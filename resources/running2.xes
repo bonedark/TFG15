@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- XES version 1.0 -->
+<!-- Created by Fluxicon Nitro (http://fluxicon.com/nitro/ -->
+<!-- (c) 2010 Fluxicon Process Laboratories / http://fluxicon.com/ -->
+<log xes.version="1.0" xmlns="http://code.deckfour.org/xes" xes.creator="Fluxicon Nitro">
+	<extension name="Concept" prefix="concept" uri="http://code.deckfour.org/xes/concept.xesext"/>
+	<extension name="Time" prefix="time" uri="http://code.deckfour.org/xes/time.xesext"/>
+	<extension name="Organizational" prefix="org" uri="http://code.deckfour.org/xes/org.xesext"/>
+	<global scope="trace">
+		<string key="concept:name" value="name"/>
+	</global>
+	<global scope="event">
+		<string key="concept:name" value="name"/>
+		<string key="Resourse" value="resource"/>
+		<date key="time:timestamp" value="2011-04-13T14:02:31.199+02:00"/>
+		<string key="Activity" value="string"/>
+		<string key="Resource" value="string"/>
+		<string key="Costs" value="string"/>
+	</global>
+	<classifier name="Activity" keys="Activity"/>
+	<classifier name="activity classifier" keys="Activity"/>
+	<trace>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="oranization country" value="cn"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2006-11-07 10:00:36"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2006-11-07 13:05:44"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2009-12-02 14:24:32"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2011-09-03 07:09:09"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2007-03-20 09:06:25"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2009-12-02 14:24:31"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2011-09-03 07:10:53"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2007-05-10 16:21:54"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2009-12-02 14:24:33"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Tomas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD753"/>
+			<date key="time:timestamp" value="2011-09-03 07:10:59"/>
+		</event>
+	</trace>
+	<trace>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="org:role" value="A2_2"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD681"/>
+			<date key="time:timestamp" value="2007-07-25 14:21:05"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD681"/>
+			<date key="time:timestamp" value="2009-12-02 14:24:32"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="concept:name" value="Queued"/>
+			<string key="product" value="PROD681"/>
+			<date key="time:timestamp" value="2010-08-25 11:13:01"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD681"/>
+			<date key="time:timestamp" value="2011-09-05 09:24:13"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="product" value="PROD681"/>
+			<date key="time:timestamp" value="2011-11-14 16:10:25"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="concept:name" value="Accepted"/>
+			<string key="impact" value="Medium"/>
+			<date key="time:timestamp" value="2012-01-03 11:30:35"/>
+		</event>
+		<event>
+			<string key="Resourse" value="Niklas"/>
+			<string key="concept:name" value="Completed"/>
+			<string key="product" value="PROD681"/>
+			<date key="time:timestamp" value="2012-01-03 11:31:53"/>
+		</event>
+	</trace>
+</log>

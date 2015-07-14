@@ -92,10 +92,83 @@ public class GeneticMinerPlugin {
     return pn;
   }
 
-  @Plugin(name = "Mine Block-structured Model  Listando candidatos", parameterLabels = {
+  @Plugin(name = "Genetic Miner GSP Plugin", parameterLabels = {
       "Event log", "Instances" }, returnLabels = { "Block Structured Model" }, returnTypes = { ArrayList.class }, userAccessible = true, help = "Mine a block structured process model Listando candidatos")
-  @UITopiaVariant(uiLabel = "00JB Mine Block Structured Process Model Listando candidatos", affiliation = "Eindhoven University of Technology", author = "J.C.A.M.Buijs", email = "j.c.a.m.buijs@tue.nl", pack = "JoosBuijs")
+  @UITopiaVariant(uiLabel = "Genetic Miner GSP Plugin", affiliation = "Universidad de La Laguna", author = "D.F.C.S", email = "alu0100463057@ull.edu.es", pack = "Process and Data Mining integrated on BI")
   public List<PetriFitness> PTGeneticMinerPluginCandidatos(
+      final PluginContext context, XLog eventlog, final Instances arff) {
+
+    final Progress progress = context.getProgress();
+
+    Canceller canceller = new Canceller() {
+
+      public boolean isCancelled() {
+        return progress.isCancelled();
+      }
+    };
+    // Set<String> attr = eventlog.getAttributes().keySet();
+    // ArrayList<Attribute> atributos = new ArrayList<Attribute>();
+    // Iterator<String> it = attr.iterator();
+    // while (it.hasNext()) {
+    // String valor = it.next();
+    // XAttribute asdf = eventlog.getAttributes().get(valor);
+    // atributos.add(new Attribute(valor));
+    // }
+    // Instances data = new Instances("GSP", atributos, 2);
+    //
+    GeneralizedSequentialPatterns gsp = new GeneralizedSequentialPatterns();
+    try {
+      gsp.buildAssociations(arff);
+    } catch (Exception e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    readFile(gsp.toString());
+    System.out.println(cycles.toString());
+    progress.setCaption("Starting Genetic Algorithm...");
+    progress.setMinimum(0);
+    // progress.setIndeterminate(true); //set indeterminate for now...
+
+    // eventlog = TreeTest.createInterleavedLog("a", "b", "c", "d", "e", "f",
+    // "g");
+
+    GeneticAlgorithm ga = new GeneticAlgorithm(context, canceller, eventlog);
+
+    ga.setPopulationSize(2000);
+    ga.setTargetFitness(0.05);
+    ga.setMaxIterations(10);
+    ga.setEliteCount(5);
+    ga.setCrossoverProbability(new Probability(0.2d));
+    ga.setRandomCandidateCount(20);
+    ga.setSteadyStates(100); // disable steady states
+
+    progress.setMaximum(ga.getMaxIterations() + 2);
+    ga.setCycles(cycles);
+
+    progress.inc();
+    try {
+      PackageManager.getInstance().findOrInstallPackages("LpSolve");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    List<Tree> tree = ga.runCandidatos(null,false);
+
+    TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
+    List<PetriFitness> pn = new ArrayList<PetriFitness>();
+    for (int i = 0; i < tree.size(); i++) {
+      PetriFitness petri = new PetriFitness(PNconvertor.buildPetrinet(tree.get(i)), tree.get(i).getOverallFitnessOld(), tree.get(i).getOverallFitness());
+      pn.add(petri);
+    }
+
+    // PNconvertor.applyMurata(context, pn);
+
+    return pn;
+  }
+  
+  @Plugin(name = "Genetic Miner GSP Plugin Inverso", parameterLabels = {
+      "Event log", "Instances" }, returnLabels = { "Block Structured Model" }, returnTypes = { ArrayList.class }, userAccessible = true, help = "Mine a block structured process model Listando candidatos")
+  @UITopiaVariant(uiLabel = "Genetic Miner GSP Plugin Inverso", affiliation = "Universidad de La Laguna", author = "D.F.C.S", email = "alu0100463057@ull.edu.es", pack = "Process and Data Mining integrated on BI")
+  public List<PetriFitness> PTGeneticMinerPluginCandidatosInverso(
       final PluginContext context, XLog eventlog, final Instances arff) {
 
     final Progress progress = context.getProgress();
@@ -137,7 +210,7 @@ public class GeneticMinerPlugin {
     ga.setPopulationSize(200);
     ga.setTargetFitness(0.05);
     ga.setMaxIterations(10);
-    ga.setEliteCount(20);
+    ga.setEliteCount(5);
     ga.setCrossoverProbability(new Probability(0.2d));
     ga.setRandomCandidateCount(20);
     ga.setSteadyStates(100); // disable steady states
@@ -151,7 +224,7 @@ public class GeneticMinerPlugin {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    List<Tree> tree = ga.runCandidatos(null);
+    List<Tree> tree = ga.runCandidatos(null,true);
 
     TreeToPNConvertor PNconvertor = new TreeToPNConvertor();
     List<PetriFitness> pn = new ArrayList<PetriFitness>();
@@ -164,6 +237,7 @@ public class GeneticMinerPlugin {
 
     return pn;
   }
+  
 
   protected void readFile(String archivo) {
 
@@ -420,7 +494,7 @@ public class GeneticMinerPlugin {
 
     // System.out.println(tree.toString());
   }
-
+  
   public List<Secuencia> getCycles() {
     return cycles;
   }
